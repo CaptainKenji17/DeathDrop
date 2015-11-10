@@ -2,7 +2,6 @@
 
 namespace DeathDrop;
 
-use pocketmine\Server;
 use pocketmine\Player;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\Listener;
@@ -21,25 +20,25 @@ class Main extends PluginBase implements Listener{
     }
     
     public function onDeath(PlayerDeathEvent $event){
-      $p = $event->getEntity();
-      $level = $p->getLevel();
-      $light = new AddEntityPacket();
-      $light->type = 93;
-      $light->eid = Entity::$entityCount++;
-      $light->metadata = array();
-      $light->speedX = 0;
-      $light->speedY = 0;
-      $light->speedZ = 0;
-      $light->yaw = $p->getYaw();
-      $light->pitch = $p->getPitch();
-      $light->x = $p->x;
-      $light->y = $p->y;
-      $light->z = $p->z;
-    foreach($level->getPlayers() as $pl){
-        $pl->dataPacket($light);
-        $event->setDrops(array(Item::get(322, 1, 1)));
-        }
+      $this->strikeLightning($event->getEntity());
+      $event->setDrops([Item::get(322, 1, 1)]);
     }
+    
+    public function strikeLightning(Player $p){
+		$light = new AddEntityPacket();
+		$light->type = 93;
+		$light->eid = Entity::$entityCount++;
+		$light->metadata = array();
+		$light->speedX = 0;
+		$light->speedY = 0;
+		$light->speedZ = 0;
+		$light->x = $p->x;
+		$light->y = $p->y;
+		$light->z = $p->z;
+		foreach($p->getLevel()->getPlayers() as $levelplayers){
+		    $levelplayers->dataPacket($light);
+		}
+	}
 }
 
 
